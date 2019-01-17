@@ -1,0 +1,425 @@
+<style lang="less">
+  .userinfo {
+  }
+
+  .userinfo-avatar {
+    width: 160rpx;
+    height: 160rpx;
+    border-radius: 50%;
+  }
+
+  .userinfo-nickname {
+    color: #aaa;
+  }
+  .auth-wrapper {
+    margin: 0 auto;
+  }
+</style>
+<template>
+  <!-- <view class="container">
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+
+    <panel>
+      <view class="title" slot="title">测试数据绑定</view>
+
+      <text class="info">{{normalTitle}}</text>
+      <text class="info">{{setTimeoutTitle}}</text>
+      <text class="info">{{mixin}}</text>
+      <text class="info">{{mynum}}</text>
+      <text class="info">{{now}}</text>
+      <text class="info">{{num}}</text>
+      <text class="info">{{asyncNum}}</text>
+      <text class="info">{{sumNum}}</text>
+      <button @tap="plus('a')" size="mini">  +  </button>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">其它测试</view>
+      <button @tap="toast" size="mini">第三方组件</button>
+      <button @tap="communicate" size="mini">组件通信</button>
+      <button @tap="tap" size="mini">混合TAP事件</button>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试并发网络请求</view>
+      <view>返回结果: <text>{{netrst}}</text></view>
+      <button @tap="request" size="mini"> 点我发起10个请求 </button>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试组件</view>
+
+      <text class="testcounter">计数组件1: </text>
+      <view class="counterview">
+        <counter1 @index-emit.user="counterEmit" />
+      </view>
+
+      <text class="testcounter">计数组件2: </text>
+
+      <view class="counterview">
+        <counter2 :num.sync="mynum"></counter2>
+      </view>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试组件Repeat</view>
+      <repeat for="" index="index" item="item" key="key">
+        <group :grouplist="item" :indexa="index"></group>
+      </repeat>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试列表</view>
+      <list></list>
+    </panel>
+
+    <toast />
+  </view> -->
+  <view class="container">
+    <view class="bg-shadow" wx-if="{{!isRegist}}">
+      <view class="confirm-wrapper">
+        <view class="confirm-title">时光带你去旅行需要获取您的昵称</view>
+        <view class="btn-wrapper">
+          <view class="btn cancel-btn" bindtap="refuse">拒绝</view>
+          <button class="btn confirm-btn" open-type="getUserInfo" plain bindgetuserinfo="getUserInfo">允许</button>
+        </view>
+      </view>
+    </view>
+    <view class="userinfo" @tap="handleViewTap">
+      <image class="userinfo-avatar" src="{{ userInfo.avatarUrl }}" background-size="cover"/>
+      <view class="userinfo-nickname">{{ userInfo.nickName }}</view>
+    </view>
+    <panel>
+      <view class="title" slot="title">测试数据绑定</view>
+
+      <text class="info">{{normalTitle}}</text>
+      <text class="info">{{setTimeoutTitle}}</text>
+      <text class="info">{{mixin}}</text>
+      <text class="info">{{mynum}}</text>
+      <text class="info">{{now}}</text>
+      <text class="info">{{num}}</text>
+      <text class="info">{{asyncNum}}</text>
+      <text class="info">{{sumNum}}</text>
+      <button @tap="plus('a')" size="mini">  +  </button>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">其它测试</view>
+      <button @tap="toast" size="mini">第三方组件</button>
+      <button @tap="communicate" size="mini">组件通信</button>
+      <button @tap="tap" size="mini">混合TAP事件</button>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试并发网络请求</view>
+      <view>返回结果: <text>{{netrst}}</text></view>
+      <button @tap="request" size="mini"> 点我发起10个请求 </button>
+    </panel>
+    <panel>
+      <view class="title" slot="title">测试组件</view>
+
+      <text class="testcounter">计数组件1: </text>
+      <view class="counterview">
+        <counter1 @index-emit.user="counterEmit" />
+      </view>
+
+      <text class="testcounter">计数组件2: </text>
+
+      <view class="counterview">
+        <counter2 :num.sync="mynum"></counter2>
+      </view>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试组件Repeat</view>
+      <repeat for="" index="index" item="item" key="key">
+        <group :grouplist="item" :indexa="index"></group>
+      </repeat>
+    </panel>
+
+    <panel>
+      <view class="title" slot="title">测试列表</view>
+      <list></list>
+    </panel>
+
+    <view @tap="goDetail">点击提交，goDetail-----</view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { connect } from 'wepy-redux'
+  import Panel from '@/components/panel' // alias example
+  import Counter from 'counter' // alias example
+  import List from '../components/list' // aliasFields example
+  // import moduleA from 'module-a' // aliasFields ignore module example
+  import Group from '../components/group'
+  import Toast from 'wepy-com-toast'
+  import testMixin from '../mixins/test'
+
+  // console.log('moduleA ignored: ', moduleA) // => moduleA ignored: {}
+
+  @connect({
+    num (state) {
+      return state.counter.num
+    },
+    asyncNum (state) {
+      return state.counter.asyncNum
+    },
+    sumNum (state) {
+      return state.counter.num + state.counter.asyncNum
+    }
+  })
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页'
+    }
+    components = {
+      panel: Panel,
+      counter1: Counter,
+      counter2: Counter,
+      list: List,
+      group: Group,
+      toast: Toast
+    }
+
+    mixins = [testMixin]
+
+    data = {
+      mynum: 20,
+      userInfo: {
+        nickName: '加载中...'
+      },
+      normalTitle: '原始标题',
+      setTimeoutTitle: '标题三秒后会被修改',
+      count: 0,
+      netrst: '',
+      groupList: [
+        {
+          id: 1,
+          name: '点击改变',
+          list: [
+            {
+              childid: '1.1',
+              childname: '子项，点我改变'
+            }, {
+              childid: '1.2',
+              childname: '子项，点我改变'
+            }, {
+              childid: '1.3',
+              childname: '子项，点我改变'
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: '点击改变',
+          list: [
+            {
+              childid: '2.1',
+              childname: '子项，点我改变'
+            }, {
+              childid: '2.2',
+              childname: '子项，点我改变'
+            }, {
+              childid: '2.3',
+              childname: '子项，点我改变'
+            }
+          ]
+        },
+        {
+          id: 3,
+          name: '点击改变',
+          list: [
+            {
+              childid: '3.1',
+              childname: '子项，点我改变'
+            }
+          ]
+        }
+      ],
+      isRegist: false
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+      plus () {
+        this.mynum++
+      },
+      toast () {
+        let promise = this.$invoke('toast', 'show', {
+          title: '自定义标题',
+          img: 'https://raw.githubusercontent.com/kiinlam/wetoast/master/images/star.png'
+        })
+
+        promise.then((d) => {
+          console.log('toast done')
+        })
+      },
+      tap () {
+        console.log('do noting from ' + this.$name)
+      },
+      communicate () {
+        console.log(this)
+        console.log(this.$name + ' tap')
+        // $invoke是一个页面或组件对另一个组件中的方法的直接调用，通过传入组件路径找到相应的组件，然后再调用其方法。
+        this.$invoke('counter2', 'minus', 45, 6)
+        this.$invoke('counter1', 'plus', 45, 6)
+
+        this.$broadcast('index-broadcast', 1, 3, 4)
+      },
+      request () {
+        let self = this
+        let i = 10
+        let map = ['MA==', 'MQo=', 'Mg==', 'Mw==', 'NA==', 'NQ==', 'Ng==', 'Nw==', 'OA==', 'OQ==']
+        while (i--) {
+          wepy.request({
+            url: 'https://www.madcoder.cn/tests/sleep.php?time=1&t=css&c=' + map[i] + '&i=' + i,
+            success: function (d) {
+              self.netrst += d.data + '.'
+              self.$apply()
+            }
+          })
+        }
+      },
+      counterEmit (...args) {
+        // @index-emit.user
+        // 自定义事件，在子组件中通过$emit触发
+        // 如果使用了自定义事件， events中对应的监听函数不会执行。
+        console.log(args)
+        let $event = args[args.length - 1]
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      },
+      getUserInfo (e) {
+        this.userInfo = e.detail.userInfo
+        if (this.userInfo.avatarUrl) {
+          this.isRegist = true
+        }
+        console.log(this.userInfo)
+      },
+      refuse () {
+        wepy.showModal({
+          content: '不授权将影响后续功能的正常使用',
+          showCancel: false,
+          confirmText: '确定',
+          confirmColor: '#4E8CEE',
+          success () {
+            this.isRegist = false
+          }
+        })
+      },
+      goDetail () {
+        wepy.navigateTo({
+          url: '/pages/detail'
+        })
+      }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(args)
+        console.log($event)
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    onLoad() {
+      console.log(`index onload`)
+      console.log(wx.canIUse('openBluetoothAdapter'))
+      // console.log(wx.canIUse('getSystemInfoSync.return.screenWidth'))
+      // console.log(wx.canIUse('getSystemInfo.success.screenWidth'))
+      // console.log(wx.canIUse('showToast.object.image'))
+      // console.log(wx.canIUse('onCompassChange.callback.direction'))
+      // console.log(wx.canIUse('request.object.method.GET'))
+
+      // console.log(wx.canIUse('live-player'))
+      // console.log(wx.canIUse('text.selectable'))
+      // console.log(wx.canIUse('button.open-type.contact'))
+
+      console.log(wx.getSystemInfoSync()) // 获取系统信息同步版本
+      wx.getSystemInfo({
+        success(res) {
+          console.log(res)
+        }
+      })
+
+      console.log(wx.getUpdateManager())
+      /*
+       UpdateManager对象，用来管理更新，通过wx.getUpdateManager()获取示例
+       UpdateManager.applyUpdate()
+       强制小程序重启并使用新版本。在小程序新版本下载完成后（即受到onUpdateReady回调）调用
+       UpdateManager.onCheckForUpdate()
+       监听向微信后台请求检查更新结果事件，微信小程序冷启动时自动检查更新，不需由开发者主动触发
+       UpdateManager.onUpdateReady()
+       监听小程序有版本更新事件，客户端主动触发下载，下载成功后回调
+       UpdateManager.onUpdateFailed()
+       监听小程序更新失败事件，小程序有新版本，客户端主动触发下载，下载失败后回调（可能是网络原因等）
+      */
+      const updateManager = wx.getUpdateManager()
+      updateManager.onCheckForUpdate((res) => {
+        console.log(res.hasUpdate)
+      })
+      // updateManager.onUpdateReady(() => {
+      //   wx.showModal({
+      //     title: '更新提示',
+      //     content: '新版本已经准备好，是否重启应用？',
+      //     success(res) {
+      //       if (res.confirm) {
+      //         updateManager.applyUpdate()
+      //       }
+      //     }
+      //   })
+      // })
+      updateManager.onUpdateFailed((res) => {
+        console.log(res)
+      })
+      // 获取日志管理器对象
+      // 参数 object object level number 默认0(会把App，Page的生命周期函数和wx命名空间下的函数调用写入日志)， 1则不会。
+      const logger = wx.getLogManager({level: 1})
+      // 最多保存5M的日志内容，超过后，旧的日志内容会被删除
+      // Object|Array <any>|number|string ...args 可以有任意多个，每次调用的参数的总大小不超过100kb
+      logger.debug({str: 'hello world'}, 'debug log', 100, [1, 2, 3])
+      logger.info({str: 'hello world'}, 'info log', 100, [1, 2, 3])
+      logger.log({str: 'hello world'}, 'basic log', 100, [1, 2, 3])
+      logger.warn({str: 'hello world'}, 'warn log', 100, [1, 2, 3])
+      console.debug(logger.debug({str: 'hello world'}, 'debug log', 100, [1, 2, 3]))
+      console.log('--------------------分割线------------')
+      console.debug('这是一个console.debug--')
+      console.info('这是一个console.info--')
+      console.log('这是一个console.log--')
+      console.error('这是一个console.error--')
+      console.group('这是一个console.group--')
+      console.groupEnd()
+      this.normalTitle = '标题已经被修改'
+      this.setTimeoutTitle = '标题三秒后会被修改'
+      console.log(setTimeout(() => {
+        this.setTimeoutTitle = '到三秒了'
+        this.$apply()
+      }, 3000))
+    }
+    onShow() {
+      console.log(this.route)
+
+      // 显示tabBar某一项的右上角的红点
+      wx.showTabBarRedDot({
+        index: 1 // tabBar的哪一项， 从左边算起
+      })
+      // 为tabBar某一项的右上角添加文本
+      wx.setTabBarBadge({
+        index: 1,
+        text: '1' // 超过4个字符则显示成...
+      })
+    }
+  }
+</script>

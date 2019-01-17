@@ -1,0 +1,190 @@
+<style lang="less">
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #434343;
+}
+.bg-shadow {
+  background: rgba(0,0,0,0.5);
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 5;
+}
+.confirm-wrapper {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  background: #fff;
+  width: 620rpx;
+}
+.confirm-title {
+  padding: 56rpx 40rpx;
+}
+.btn-wrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  .btn {
+    width: 50%;
+    border-top: 1px solid #F5F7FB;
+    border-bottom: 0;
+    border-left: 0;
+    border-right: 0;
+    font-size: 16px;
+    line-height: 98rpx;
+  }
+  .cancel-btn {
+    border-right: 1px solid #F5F7FB;
+  }
+  .confirm-btn {
+    color: #4E8CEE;
+  }
+}
+</style>
+
+<script>
+import wepy from 'wepy'
+import 'wepy-async-function'
+
+import { setStore } from 'wepy-redux'
+import configStore from './store'
+
+const store = configStore()
+setStore(store)
+
+export default class extends wepy.app {
+  config = {
+    pages: [
+      'pages/index',
+      'pages/discover',
+      'pages/plan',
+      'pages/mine',
+      'pages/detail'
+    ],
+    window: {
+      navigationBarBackgroundColor: '#fff', // 导航栏背景颜色，hexColor
+      navigationBarTextStyle: 'black', // 导航栏标题颜色，仅支持black/white
+      navigationBarTitleText: '时光机', // 导航栏标题文字内容， 页面里面设置该属性会覆盖app里面的配置
+      navigationStyle: 'default', // 导航栏样式default 默认样式 custom 自定义导航栏，只保留右上角胶囊按钮
+      backgroundColor: '#fff', // 窗口背景色
+      backgroundTextStyle: 'dark', // 下拉loading的样式，仅支持dark,light
+      backgroundColorTop: '', // 顶部窗口的背景色，仅IOS支持
+      backgroundColorBottom: '', //  底部窗口的背景色，仅IOS支持
+      enablePullDownRefresh: true // 是否开启当前页面的下拉刷新
+    },
+    tabBar: {
+      color: '#CDD1D9', // tab文字颜色
+      selectedColor: '#4E8CEE', // tab文字选中时的颜色
+      backgroundColor: '#fff', // tab背景色
+      borderStyle: 'white',
+      // list 接受一个数组，只能配置最少2个、最多5个 tab。tab 按数组的顺序排序，每个项都是一个对象，其属性值如下：
+      list: [
+        {
+          'pagePath': 'pages/index',
+          'text': '首页',
+          'iconPath': 'assets/tab_icon/index.png',
+          'selectedIconPath': 'assets/tab_icon/index_selected.png'
+        },
+        {
+          'pagePath': 'pages/discover',
+          'text': '发现',
+          'iconPath': 'assets/tab_icon/discover.png',
+          'selectedIconPath': 'assets/tab_icon/discover_selected.png'
+        },
+        {
+          'pagePath': 'pages/plan',
+          'text': '计划',
+          'iconPath': 'assets/tab_icon/plan.png',
+          'selectedIconPath': 'assets/tab_icon/plan_selected.png'
+        },
+        {
+          'pagePath': 'pages/mine',
+          'text': '我的',
+          'iconPath': 'assets/tab_icon/mine.png',
+          'selectedIconPath': 'assets/tab_icon/mine_selected.png'
+        }
+      ],
+      position: 'bottom' // tabBar位置，仅支持bottom/top
+    }
+  }
+
+  globalData = {
+    userInfo: null,
+    isRegist: false
+  }
+
+  constructor () {
+    super()
+    this.use('requestfix')
+    this.use('promisify')
+  }
+  // 生命周期： 监听小程序初始化完成时，全局只触发一次
+  onLaunch (options) {
+    console.log(options)
+    // options参数获取等同于wx.getLaunchOptionsSync获取小程序启动时的参数
+    console.log(wx.getLaunchOptionsSync())
+    this.testAsync()
+  }
+  // 生命周期： 监听小程序显示
+  onShow (options) {
+    console.log(options)
+    console.log(`小程序启动了/从后台进入前台显示时--`)
+    // options参数获取等同于wx.onAppShow回调函数的参数
+    wx.onAppShow((options) => {
+      console.log(options)
+    })
+    if (!this.userInfo) {
+      this.isRegist = false
+    } else {
+      this.isRegist = true
+    }
+  }
+
+  // 生命周期：监听小程序隐藏
+  onHide () {
+    console.log(`小程序隐藏，从前台进入后台---`)
+  }
+  // 错误监听函数： 小程序发生脚本错误，或者 api 调用失败时触发，会带上错误信息
+  onError (msg) {
+    console.log(msg)
+  }
+
+  sleep (s) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('promise resolved')
+      }, s * 1000)
+    })
+  }
+
+  async testAsync () {
+    const data = await this.sleep(3)
+    console.log(data)
+  }
+
+  // getUserInfo(cb) {
+  //   console.log(`getUserInfo`)
+  //   const that = this
+  //   if (this.globalData.userInfo) {
+  //     return this.globalData.userInfo
+  //   }
+  //   wepy.getUserInfo({
+  //     success (res) {
+  //       console.log(res)
+  //       that.globalData.userInfo = res.userInfo
+  //       cb && cb(res.userInfo)
+  //     }
+  //   })
+  // }
+}
+</script>

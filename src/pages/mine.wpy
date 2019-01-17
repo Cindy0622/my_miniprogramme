@@ -1,0 +1,129 @@
+<style lang="less">
+  .flex-wrp {
+    display: flex;
+    font-size: 12px;
+  }
+  .flex-item {
+    width: 100px;
+    height: 100px;
+  }
+  .bc_green {
+    background:#73f754;
+  }
+  .bc_red {
+    background: #f77354;
+  }
+  .bc_blue {
+    background: #54f6f7;
+  }
+  .bc_yellow {
+    background: #e2e637;
+  }
+</style>
+<template>
+  <view>
+    <view class="section">
+        <view class="section__title">flex-direction: row</view>
+        <view class="flex-wrp" style="flex-direction:row;">
+            <view class="flex-item bc_green" @tap="showActionSheet">actionSheet</view>
+            <view class="flex-item bc_red" @tap="showLoading">loading</view>
+            <view class="flex-item bc_blue" @tap="showToast">toast</view>
+            <view class="flex-item bc_yellow" @tap="showModal">modal</view>
+        </view>
+        </view>
+        <view class="section">
+        <view class="section__title">flex-direction: column</view>
+        <view class="flex-wrp" style="height: 300px;flex-direction:column;">
+            <view class="flex-item bc_green">1</view>
+            <view class="flex-item bc_red">2</view>
+            <view class="flex-item bc_blue">3</view>
+        </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import testMixin from '../mixins/test'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的'
+    }
+    components = {
+    }
+
+    mixins = [testMixin]
+
+    data = {
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+      showActionSheet () {
+        wx.showActionSheet({
+          itemList: ['test1', 'test2', 'test3'],
+          itemColor: '#69a0e0',
+          success(res) {
+            console.log(res.tapIndex)
+          },
+          fail(res) {
+            console.log(res.errMsg)
+          },
+          complete(res) {
+            console.log(res)
+          }
+        })
+      },
+      showLoading () {
+        wx.showLoading({
+          title: '加载中',
+          mask: true
+        })
+        setTimeout(function () {
+          wx.hideLoading()
+        }, 2000)
+      },
+      showToast () {
+        wx.showToast({
+          title: '不显示图标，此时 title 文本最多可显示两行，1.9.0及以上版本支持', // sucess, loading图标，最多展示7个汉字长度。
+          icon: 'none',
+          image: '/assets/tab_icon/index.png', // image层级高于icon层级
+          duration: 1000, // 默认1500s
+          mask: true
+        })
+      },
+      showModal () {
+        wx.showModal({
+          title: '是否允许获得个人信息',
+          content: '包含昵称，地区等',
+          success(res) {
+            console.log(res)
+          },
+          fail (res) {
+            console.log(res)
+          }
+        })
+      }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(args)
+        console.log($event)
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    onLoad() {
+    }
+    onShow() {
+    }
+  }
+</script>

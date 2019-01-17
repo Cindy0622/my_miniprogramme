@@ -1,0 +1,171 @@
+<style lang="less">
+  .new_font {
+    font-family: Bitstream Vera Serif Bold;
+  }
+</style>
+<template>
+  <view>
+    <button
+      @tap="navigateBack">navigateBack回到上一页</button>
+    <button
+      @tap="switchTab">switchTab回到首页</button>
+    <button
+      @tap="navigateTo">navigateTo非tabBar页面</button>
+    <button
+      @tap="reLaunch">reLaunch到指定页面</button>
+    <button
+      @tap="redirectTo">redirectTo到指定页面</button>
+    <text class="new_font">网络字体</text>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import testMixin from '../mixins/test'
+
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '发现-目的地'
+    }
+    components = {
+    }
+
+    mixins = [testMixin]
+
+    data = {
+    }
+
+    computed = {
+      now () {
+        return +new Date()
+      }
+    }
+
+    methods = {
+      navigateBack () {
+        // 关闭当前页面，返回上一页面或多级页面
+        // 可通过getCurrentPages()获取当前的页面栈，决定需要返回几层。
+        // delta 返回的页面数，如果num > 现有页面数，则返回到首页
+        wx.navigateBack({
+          delta: 1,
+          success(res) {
+            console.log('navigateBack----index')
+          }
+        })
+      },
+      switchTab () {
+        // 跳转到tabBar页面，并关闭其他所有非tabBar页面
+        // 注意前面要有/
+        wx.switchTab({
+          url: '/pages/index',
+          success(res) {
+            console.log('switchTab----index')
+          }
+        })
+      },
+      navigateTo () {
+        // 保留当前页面，跳转到应用内的某个页面，但是不能跳到tabBar页面。
+        wx.navigateTo({
+          url: '/pages/detail',
+          success(res) {
+            console.log('navigateTo---detail')
+          }
+        })
+      },
+      reLaunch () {
+        // 关闭所有页面，打开到应用内的某个页面
+        wx.reLaunch({
+          url: '/pages/detail'
+        })
+      },
+      redirectTo () {
+        // 关闭当前页面，跳转到应用内的某个页面。但是不允许跳转到tabBar页面
+        wx.redirectTo({
+          url: '/pages/detail'
+        })
+      }
+    }
+
+    events = {
+      'index-emit': (...args) => {
+        let $event = args[args.length - 1]
+        console.log(args)
+        console.log($event)
+        console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+      }
+    }
+
+    onLoad() {
+      // 设置页面导航栏颜色
+      wx.setNavigationBarColor({
+        frontColor: '#ffffff', // 前景颜色（按钮，标题，状态栏）， 仅支持#fffff 和#000000
+        backgroundColor: '#4a90e2', // 背景颜色值，有效值为十六进制颜色
+        animation: {
+          duration: 400, // 动画变化时间，单位ms
+          timingFunc: 'linear' // 动画变化方式 linear 匀速， easeIn 低速开始，easeOut 低速结束，easeInOut 低速开始和结束
+        }
+      })
+      // 设置当前页面的标题
+      wx.setNavigationBarTitle({
+        title: '想去哪，就去哪'
+      })
+      // 设置下拉背景字体，loading图的样式
+      wx.setBackgroundTextStyle({
+        textStyle: 'light', // dark/light 样式
+        success(res) {
+          console.log(res)
+        }
+      })
+      // 动态设置窗口的背景色
+      wx.setBackgroundColor({
+        backgroundColor: '#eaf4ff'
+      })
+    }
+    onShow() {
+      // 当前页面显示导航条加载动画
+      wx.showNavigationBarLoading({
+        success(res) {
+          console.log(res)
+        }
+      })
+      setTimeout(() => {
+        wx.hideNavigationBarLoading({
+          success(res) {
+            console.log(res)
+          }
+        })
+      }, 1000)
+      // 隐藏tabBar某一项的右上角的红点
+      wx.hideTabBarRedDot({
+        index: 1
+      })
+      // 移除tabBar 某一项右上角的文本
+      wx.removeTabBarBadge({
+        index: 1
+      })
+
+      wx.loadFontFace({
+        family: 'Bitstream Vera Serif Bold',
+        source: 'url("https://sungd.github.io/Pacifico.ttf")',
+        success: console.log
+      })
+
+      // 开始下拉刷新。调用后触发下拉刷新动画，效果与用户手动下拉刷新一致。
+      wx.startPullDownRefresh({
+        success(res) {
+          console.log(res)
+        }
+      })
+    }
+
+    onPullDownRefresh() {
+      setTimeout(() => {
+        wx.stopPullDownRefresh({
+          success(res) {
+            console.log(res)
+          }
+        })
+      }, 2000)
+    }
+  }
+</script>

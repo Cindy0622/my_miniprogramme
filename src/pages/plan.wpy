@@ -1,0 +1,104 @@
+<style lang="less">
+.list {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #f5f7fb;
+}
+.li-t {
+  flex: 1;
+  text-align: center;
+  &.active {
+    color: #6cc7f5;
+  }
+}
+.plan-section {
+  width: 100%;
+}
+.bottom {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+</style>
+<template>
+  <view class="container">
+    <view class="list">
+      <!-- dataset传参， event接收参数 -->
+      <!-- <view :class="{'li-t': true, 'active': index === isSelected}" wx:for="{{journeyType}}" wx:key="index" @tap="chooseType" data-index="{{index}}">{{item}}</view> -->
+
+      <!-- wepy优化传参 -->
+      <view 
+        :class="{'li-t': true, 'active': index === isSelected}"
+        wx:for="{{journeyType}}"
+        wx:key="index"
+        @tap="chooseType({{index}})">{{item}}</view>
+    </view>
+    <view wx:if="{{isSelected === 0}}" class="plan-section">周边游</view>
+    <view wx:elif="{{isSelected === 1}}" class="plan-section">国内游</view>
+    <view wx:else class="plan-section">出境游</view>
+
+
+    <text @tap="backToTop" class="bottom">回到顶部</text>
+  </view>
+</template>
+
+<script>
+import wepy from 'wepy'
+import testMixin from '../mixins/test'
+const journeyType = [
+  '周边游',
+  '国内游',
+  '出境游'
+]
+export default class Index extends wepy.page {
+  config = {
+    navigationBarTitleText: '去哪儿？计划一下'
+  }
+  components = {
+  }
+
+  mixins = [testMixin]
+
+  data = {
+    journeyType,
+    isSelected: 0
+  }
+
+  computed = {
+    now () {
+      return +new Date()
+    }
+  }
+
+  methods = {
+    // chooseType (event) {
+    //   this.isSelected = event.currentTarget.dataset.index
+    // }
+    chooseType (index) {
+      this.isSelected = index
+    },
+    backToTop () {
+      wx.pageScrollTo({
+        scrollTop: 0,
+        duration: 3000
+      })
+    }
+  }
+
+  events = {
+    'index-emit': (...args) => {
+      let $event = args[args.length - 1]
+      console.log(args)
+      console.log($event)
+      console.log(`${this.$name} receive ${$event.name} from ${$event.source.$name}`)
+    }
+  }
+
+  onLoad () {
+  }
+  onShow () {
+  }
+}
+</script>
