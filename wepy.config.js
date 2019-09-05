@@ -40,34 +40,9 @@ module.exports = {
       ]
     }
   },
-  plugins: {
-  },
+  plugins: [],
   appConfig: {
     noPromiseAPI: ['createSelectorQuery']
   }
 }
 
-if (prod) {
-  // 压缩sass
-  // module.exports.compilers['sass'] = {outputStyle: 'compressed'}
-
-  // 压缩js
-  module.exports.plugins = {
-    uglifyjs: {
-      filter: /\.js$/,
-      config: {
-      }
-    },
-    imagemin: {
-      filter: /\.(jpg|png|jpeg)$/,
-      config: {
-        jpg: {
-          quality: 80
-        },
-        png: {
-          quality: 80
-        }
-      }
-    }
-  }
-}
